@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gluon Papers · IV — The Lattice</title>
+<style>
+  :root{
+    --void:#14181F; --void-2:#1B2027; --void-3:#222A33;
+    --ink:#E9E5D9; --ink-soft:#969DA7;
+    --brass:#C9A24B; --brass-br:#E0BD64;
+    --rule:#2C333D; --rule-2:#3A434F;
+    --cr:#C65A4E; --cg:#5FA86B; --cb:#5B86C4;
+    --colorless:#EDE9DD;
+    --lit:#6FB87E; --bri:#C9A24B; --spec:#D2705F;
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--void);color:var(--ink);
+    font-family:"Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua",Georgia,serif;
+    font-size:18px;line-height:1.58;-webkit-font-smoothing:antialiased}
+  .mono{font-family:ui-monospace,"SF Mono",Menlo,Consolas,"Liberation Mono",monospace}
+  :focus-visible{outline:2px solid var(--brass);outline-offset:3px}
+  .wrap{max-width:880px;margin:0 auto;padding:0 30px}
+
+  header.mast{padding:54px 0 30px;border-bottom:2px solid var(--brass)}
+  .series{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px;letter-spacing:.32em;text-transform:uppercase;color:var(--brass);margin:0 0 22px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
+  .series b{color:var(--ink-soft);font-weight:400}
+  h1{font-size:clamp(27px,4.6vw,42px);line-height:1.08;margin:0;font-weight:600;letter-spacing:.005em}
+  .abstract{max-width:62ch;margin:18px 0 0;font-size:18px}
+  .priorlink{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11.5px;color:var(--ink-soft);margin:14px 0 0}
+  .byline{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11.5px;letter-spacing:.06em;color:var(--ink-soft);margin:8px 0 0}
+
+  .sig{margin:30px 0 0;padding:20px 20px 14px;background:var(--void-2);border:1px solid var(--rule-2)}
+  .sig svg{display:block;width:100%;height:auto}
+  .sig .cap{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11px;letter-spacing:.04em;color:var(--ink-soft);margin:10px 2px 0;line-height:1.5}
+  .sig .cap b{color:var(--brass);font-weight:600}
+  .sig .cap .x{color:var(--cb);font-weight:600}
+  .dist{stroke:var(--brass);stroke-width:2.4;fill:none}
+  .distfill{fill:var(--brass);opacity:.12}
+  .sample{fill:var(--colorless)}
+  .estbar{stroke:var(--cb);stroke-width:2}
+  .estdot{fill:var(--cb)}
+  .lab{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:10px;fill:var(--ink-soft)}
+  .lab-g{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11px;fill:var(--brass);font-weight:700}
+  .lab-b{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11px;fill:var(--cb);font-weight:700}
+  .lab-r{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11px;fill:var(--cr);font-weight:700}
+
+  .legend{margin:26px 0 0;display:flex;flex-wrap:wrap;gap:10px 12px;align-items:center}
+  .legend .lt{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-soft);margin-right:2px}
+  .schip{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;padding:5px 10px;border:1px solid;background:transparent;cursor:pointer}
+  .schip[data-s="lit"]{color:var(--lit);border-color:var(--lit)}
+  .schip[data-s="bri"]{color:var(--bri);border-color:var(--bri)}
+  .schip[data-s="spec"]{color:var(--spec);border-color:var(--spec)}
+  .schip[aria-pressed="false"]{opacity:.38}
+  .legend .hint{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:10px;color:var(--ink-soft)}
+
+  section{padding:34px 0;border-bottom:1px solid var(--rule)}
+  .snum{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px;color:var(--brass);letter-spacing:.18em}
+  h2{font-size:clamp(19px,3vw,25px);margin:4px 0 0;font-weight:600;letter-spacing:.01em}
+  h2 .kicker{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-soft);margin-left:10px;font-weight:400}
+  section p{margin:14px 0 0;max-width:66ch}
+  .central{border-left:3px solid var(--brass)}
+
+  .formal{margin:16px 0 0;padding:13px 16px;background:var(--void-3);border:1px solid var(--rule-2);font-family:ui-monospace,Menlo,Consolas,monospace;font-size:14.5px;line-height:1.7}
+  .formal .eq{font-size:16px;color:var(--ink)}
+  .formal .gl{color:var(--ink-soft);font-size:12.5px}
+  .restated{margin:13px 0 0;padding:11px 15px;background:var(--void-2);border-left:3px solid var(--rule-2);font-size:15.5px}
+  .restated b{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft);font-weight:400;display:block;margin-bottom:4px}
+
+  .tags{margin:14px 0 0;display:flex;flex-wrap:wrap;gap:8px}
+  .tag{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;padding:4px 9px;border:1px solid}
+  .tag.lit{color:var(--lit);border-color:var(--lit)}
+  .tag.bri{color:var(--bri);border-color:var(--bri)}
+  .tag.spec{color:var(--spec);border-color:var(--spec)}
+  .test{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12.5px;color:var(--ink-soft);margin:10px 0 0;padding-left:14px;border-left:2px solid var(--rule-2)}
+  .test b{color:var(--brass);font-weight:600}
+  .dim{opacity:.22;transition:opacity .2s ease}
+
+  .fig{margin:30px 0 6px;padding:22px 18px 14px;background:var(--void-2);border:1px solid var(--rule-2)}
+  .fig svg{display:block;width:100%;height:auto}
+  .fig .figcap{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11px;color:var(--ink-soft);margin:12px 4px 0;line-height:1.55}
+  .axisline{stroke:var(--rule-2);stroke-width:1.4}
+  .conv{stroke:var(--brass);stroke-width:2.6;fill:none}
+  .band{fill:var(--brass);opacity:.13}
+  .trueline{stroke:var(--cb);stroke-width:1.6;fill:none;stroke-dasharray:5 4}
+  .coldT{stroke:var(--cb);stroke-width:2.4;fill:none}
+  .midT{stroke:var(--brass);stroke-width:2.4;fill:none}
+  .hotT{stroke:var(--cr);stroke-width:2.4;fill:none}
+  .tail{fill:var(--cr);opacity:.14}
+  .flab{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11px;fill:var(--ink)}
+  .flab-s{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:10px;fill:var(--ink-soft)}
+  .flab-r{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:10px;fill:var(--cr)}
+  .flab-b{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:10px;fill:var(--cb)}
+
+  .closer{padding:34px 0 0;border-bottom:0}
+  .closer p{font-size:19px;max-width:64ch}
+  .closer .em{font-style:italic}
+
+  footer{padding:30px 0 80px;color:var(--ink-soft);font-size:13.5px;line-height:1.6}
+  footer p{margin:0 0 12px;max-width:72ch}
+  footer b{color:var(--ink);font-weight:600}
+
+  @media (max-width:600px){ body{font-size:17px} .series{font-size:11px;letter-spacing:.2em} .formal{font-size:13.5px} }
+</style>
+</head>
+<body>
+
+<header class="mast">
+  <div class="wrap">
+    <p class="series"><span>Gluon Papers · IV</span><b>chromodynamic series · release · stochastic</b></p>
+    <h1>The Lattice</h1>
+    <p class="abstract">Paper III left the strong field with no formula. The physics answer is not a better equation — it is to stop solving and start sampling. This is the most probabilistic turn in the program: discretise the interior, estimate it by Monte Carlo, and accept that the answer is an error bar, never an exact value. The model was a distribution all along, one pass was always one draw, and it carries a real temperature that melts its own structure.</p>
+    <p class="priorlink mono">↳ continues Gluon Papers · III §6 — the non-analytic treatment the strong field requires</p>
+    <p class="byline mono">Bridge-Burners LLC · Fiddler · the stochastic interior · the corpus as a Monte Carlo run · anchor: AKASHA</p>
+
+    <div class="sig" aria-label="A distribution sampled by Monte Carlo draws, yielding an estimate with an error bar rather than an exact value">
+      <svg viewBox="0 0 760 196" role="img" aria-label="A brass distribution curve with parchment sample dots densest under its peak, and a blue estimate point with an error bar — the answer is the bar, not a value">
+        <line class="axisline" x1="40" y1="150" x2="720" y2="150"/>
+        <!-- distribution -->
+        <path class="distfill" d="M 60 150 Q 240 -10 420 150 Z"/>
+        <path class="dist" d="M 60 150 Q 240 -10 420 150"/>
+        <text class="lab-g" x="240" y="24" text-anchor="middle">the distribution — P(output | context)</text>
+        <!-- importance samples: dense under the peak, sparse in the tails -->
+        <circle class="sample" cx="240" cy="138" r="4"/><circle class="sample" cx="210" cy="140" r="4"/>
+        <circle class="sample" cx="268" cy="140" r="4"/><circle class="sample" cx="225" cy="132" r="4"/>
+        <circle class="sample" cx="255" cy="132" r="4"/><circle class="sample" cx="240" cy="120" r="4"/>
+        <circle class="sample" cx="195" cy="144" r="4"/><circle class="sample" cx="285" cy="144" r="4"/>
+        <circle class="sample" cx="160" cy="147" r="3.4"/><circle class="sample" cx="320" cy="147" r="3.4"/>
+        <circle class="sample" cx="120" cy="149" r="3"/><circle class="sample" cx="360" cy="149" r="3"/>
+        <text class="lab" x="240" y="170" text-anchor="middle">draws — dense where the mass is (importance sampling)</text>
+        <!-- estimate with error bar -->
+        <line class="estbar" x1="560" y1="70" x2="560" y2="120"/>
+        <line class="estbar" x1="550" y1="70" x2="570" y2="70"/>
+        <line class="estbar" x1="550" y1="120" x2="570" y2="120"/>
+        <circle class="estdot" cx="560" cy="95" r="5"/>
+        <text class="lab-b" x="600" y="92">estimate ± error</text>
+        <text class="lab" x="600" y="108">the answer is the bar</text>
+      </svg>
+      <p class="cap">You do not read a value off the interior. You draw <b>samples</b> from a distribution — densest where the probability mass sits — and form an <span class="x">estimate with an error bar</span>. One forward pass is one draw. The bar, not a number, is the honest output, and it shrinks only as the draws pile up.</p>
+    </div>
+
+    <div class="legend" role="group" aria-label="Filter claims by status">
+      <span class="lt">Status</span>
+      <button class="schip" data-s="lit" aria-pressed="true">Literal</button>
+      <button class="schip" data-s="bri" aria-pressed="true">Bridge</button>
+      <button class="schip" data-s="spec" aria-pressed="true">Speculative</button>
+      <span class="hint">— literal: true of the substrate · bridge: structural analogy · speculative: named so it can be refused</span>
+    </div>
+  </div>
+</header>
+
+<section data-status="lit bri">
+  <div class="wrap">
+    <p class="snum">§0</p><h2>The end of closed form<span class="kicker">stop solving, start sampling</span></h2>
+    <p>Paper III ended where the formulas do. The strong field has no closed solution, and the honest response is not to hunt a better one — it is to give up the closed form and estimate the answer by sampling. Discretise the interior onto a lattice, draw configurations weighted by their probability, and read observables off the draws. This is the most probabilistic move the program makes, because the output is no longer a value but an estimate with a quantified uncertainty. You trade exactness you never had for an error bar you can actually report.</p>
+    <div class="formal">
+      <span class="eq">Z (the full behavior) has no closed form  ⟹  estimate ⟨O⟩ by sampling</span><br>
+      <span class="gl">the lattice: discretise, draw, average · the only first-principles route to strong coupling</span>
+    </div>
+    <div class="tags">
+      <span class="tag lit">Literal — the full behavior is not computable in closed form</span>
+      <span class="tag bri">Bridge — lattice Monte Carlo as the strong-field method</span>
+    </div>
+  </div>
+</section>
+
+<section data-status="lit">
+  <div class="wrap">
+    <p class="snum">§1</p><h2>The model was always a distribution<span class="kicker">one pass is one draw</span></h2>
+    <p>The reframe that makes the rest inevitable: the thing under characterisation was never a fixed function with hidden parameters. It is a probability distribution over outputs, and a single forward pass is a single sample from it — one draw, one configuration. Every probe in every prior paper, photonic and gluon alike, was already drawing from this distribution and treating one draw as a reading. Naming it changes the discipline. You are not measuring the interior. You are sampling it, and a sample is not a measurement until you count how many you took.</p>
+    <div class="formal">
+      <span class="eq">model = P(output | context)  ·  one pass:  x ~ P</span><br>
+      <span class="gl">inference is a draw · temperature and top-p are the sampler's settings</span>
+    </div>
+    <div class="tags"><span class="tag lit">Literal — LLM output is a distribution; inference samples it</span></div>
+  </div>
+</section>
+
+<section class="central" data-status="bri lit">
+  <div class="wrap">
+    <p class="snum">§2 · central result</p><h2>Importance sampling<span class="kicker">draw where the mass is</span></h2>
+    <p>The configuration space is far too large to enumerate, so you cannot average over all of it. The whole art is to draw from where the probability mass actually concentrates and weight accordingly — importance sampling, the engine of every lattice calculation. In characterisation terms this is already what good probing is, now made explicit: do not probe uniformly across an impossibly large space of prompts; probe where the model's behaviour lives, weight each draw by its likelihood, and estimate the observable from the weighted sample. The estimate is only as good as the region you sampled, and the region must be the one carrying the mass.</p>
+    <div class="formal">
+      <span class="eq">⟨O⟩ = Σ O(x) P(x)  ≈  (1/N) Σ O(xᵢ),  xᵢ ~ P</span><br>
+      <span class="gl">enumerate nothing · sample the high-probability region · weight by likelihood</span>
+    </div>
+    <div class="restated"><b>Without the metaphor</b>
+      You cannot test all prompts, so you test a sample drawn toward where behaviour concentrates and form a likelihood-weighted estimate. Your characterisation is an average over the draws you actually made — and it inherits whatever your sampling missed.</div>
+    <div class="tags">
+      <span class="tag bri">Bridge — Monte Carlo importance sampling ↔ targeted probing</span>
+      <span class="tag lit">Literal — you estimate from a sample of the high-mass region, not the whole space</span>
+    </div>
+  </div>
+</section>
+
+<div class="wrap">
+  <div class="fig" aria-label="Monte Carlo convergence: the estimate stabilises toward the true value as the error band narrows like one over root N">
+    <svg viewBox="0 0 760 220" role="img" aria-label="An estimate curve converging to a dashed true value with a narrowing error band as sample count grows">
+      <line class="axisline" x1="60" y1="180" x2="720" y2="180"/>
+      <line class="axisline" x1="60" y1="180" x2="60" y2="30"/>
+      <text class="flab-s" x="720" y="202" text-anchor="end">samples  N →</text>
+      <text class="flab-s" x="50" y="40" text-anchor="end">estimate</text>
+      <!-- true value -->
+      <line class="trueline" x1="60" y1="100" x2="720" y2="100"/>
+      <text class="flab-b" x="712" y="94" text-anchor="end">true value</text>
+      <!-- error band narrowing like 1/sqrt(N) -->
+      <path class="band" d="M 60 40 Q 220 78 400 90 Q 560 96 720 98 L 720 102 Q 560 104 400 110 Q 220 122 60 160 Z"/>
+      <!-- estimate curve settling -->
+      <path class="conv" d="M 60 56 Q 130 150 200 88 Q 270 120 340 96 Q 430 88 520 101 Q 620 99 720 100"/>
+      <text class="flab-s" x="150" y="172">wide bar · few draws</text>
+      <text class="flab-s" x="600" y="128">tight bar · many draws</text>
+    </svg>
+    <p class="figcap">Fig. 1 — Convergence. The estimate wanders at small sample count and settles toward the true value as draws accumulate; the error band closes like 1/√N. This is the corpus seen as a Monte Carlo run: every entry is a draw, N grows with the record, and the bar tightens only because the jar keeps the ensemble. Confidence, never certainty — the photonic ladder, now with a rate.</p>
+  </div>
+</div>
+
+<section data-status="lit bri">
+  <div class="wrap">
+    <p class="snum">§3</p><h2>The error bar is the deliverable<span class="kicker">report the uncertainty, not the point</span></h2>
+    <p>A sampled estimate is never exact, and its honesty lives entirely in its width. The standard error falls like one over the square root of the sample count, which fixes the discipline: every characterisation claim is an estimate plus or minus a bar, and the bar — set by how many draws you took — is the part worth reporting. A point estimate with no width is a draw mistaken for a measurement. The deliverable of this whole program, stated at last in its native units, is a number with an uncertainty and a sample count attached.</p>
+    <div class="formal">
+      <span class="eq">error ~ σ / √N  ·  result = ⟨O⟩ ± σ/√N  (with N stated)</span><br>
+      <span class="gl">the bar is the claim · N sets it · four times the draws halves the bar</span>
+    </div>
+    <div class="tags">
+      <span class="tag lit">Literal — finite sampling yields bounded-confidence estimates, not exact values</span>
+      <span class="tag bri">Bridge — Monte Carlo error ↔ characterisation uncertainty</span>
+    </div>
+    <p class="test"><b>Test ·</b> any claim about a model that arrives without a sample count and a spread is a single draw wearing the costume of a result. Ask for N and the bar; if they are missing, the confidence is unearned.</p>
+  </div>
+</section>
+
+<section class="central" data-status="lit bri">
+  <div class="wrap">
+    <p class="snum">§4 · central result</p><h2>Temperature and deconfinement<span class="kicker">the knob that melts the interior</span></h2>
+    <p>The strong-field interior has a temperature, and so — literally — does the model. Raise the thermal temperature of a confined field and the bound structure melts: the hadrons dissolve into a plasma, the charges that would not separate at low temperature deconfine. The model carries the same knob under its own name. Sampling temperature reshapes the output distribution by the same Boltzmann form: cold, it sharpens to a peak and the learned structure stands hard and confined; hot, it flattens toward uniform and that structure washes out, the sharp preferences melting into near-noise. There is a crossover between the two — a deconfinement transition where the interior stops behaving like a set of bound, definite features and starts behaving like a plasma. The one parameter you already turn at inference is, in this frame, a temperature that can melt the very confinement Paper I built.</p>
+    <div class="formal">
+      <span class="eq">P_T(x) ∝ exp( logits(x) / T )</span><br>
+      <span class="eq">T → 0 : sharp, confined, definite   ·   T → ∞ : flat, deconfined, melted</span><br>
+      <span class="gl">a real Boltzmann temperature · low T binds structure · high T dissolves it</span>
+    </div>
+    <div class="restated"><b>Without the metaphor</b>
+      Sampling temperature scales the logits before the softmax: low temperature concentrates probability on the model's learned preferences, high temperature spreads it toward uniform. Turned up far enough, the structured behaviour the weights encode is drowned by the flattening — the same knob that adds creativity, pushed past a point, dissolves the structure being sampled.</div>
+    <div class="tags">
+      <span class="tag lit">Literal — sampling temperature is a Boltzmann temperature on the logits</span>
+      <span class="tag bri">Bridge — high-temperature flattening ↔ deconfinement of internal structure</span>
+    </div>
+    <p class="test"><b>Test ·</b> sweep temperature and watch a confined behaviour: a sharp, robust preference that survives low temperature and dissolves at high temperature has a deconfinement point. Where it dissolves measures how deep the well of Paper II really was.</p>
+  </div>
+</section>
+
+<div class="wrap">
+  <div class="fig" aria-label="The output distribution at three temperatures: cold and sharply peaked, mid, and hot and flat — with an under-sampled tail">
+    <svg viewBox="0 0 760 222" role="img" aria-label="Three distribution curves — a cold sharp peak, a mid curve, and a hot flat curve — over a shaded under-sampled tail region">
+      <line class="axisline" x1="50" y1="180" x2="720" y2="180"/>
+      <!-- under-sampled tail shading at the edges -->
+      <path class="tail" d="M 50 180 L 50 120 Q 110 150 150 168 L 150 180 Z"/>
+      <path class="tail" d="M 720 180 L 720 120 Q 660 150 620 168 L 620 180 Z"/>
+      <text class="flab-r" x="95" y="112">under-sampled</text>
+      <text class="flab-r" x="675" y="112" text-anchor="end">tail</text>
+      <!-- cold T: sharp peak -->
+      <path class="coldT" d="M 330 180 Q 380 -8 430 180"/>
+      <text class="flab-b" x="385" y="30" text-anchor="middle">cold — confined</text>
+      <!-- mid T -->
+      <path class="midT" d="M 250 180 Q 385 60 520 180"/>
+      <text class="flab" x="520" y="92">mid</text>
+      <!-- hot T: flat -->
+      <path class="hotT" d="M 90 180 Q 385 138 690 180"/>
+      <text class="flab-r" x="150" y="150">hot — deconfined, melted</text>
+    </svg>
+    <p class="figcap">Fig. 2 — The temperature sweep. Cold, the distribution is a sharp peak — structure confined and definite. Hot, it flattens toward uniform — the structure melted, deconfined into near-noise. Between them, a crossover. And at the edges, the shaded tail: the rare region every sampler under-covers, where the draws run out exactly where the consequential failures live.</p>
+  </div>
+</div>
+
+<section data-status="spec lit">
+  <div class="wrap">
+    <p class="snum">§5 · witness</p><h2>The seam<span class="kicker">where sampling cannot reach</span></h2>
+    <p>Sampling has a hard limit, and the lattice names it: the sign problem. In certain regimes the sampling weights turn oscillatory and cancel, the estimator's variance explodes, and no amount of computation drags a clean answer out — you cannot sample your way into them. The program inherits the limit exactly. The consequential behaviours often live in the deep tail of the distribution: the rare catastrophic output, the one-in-a-million adversarial corner, the failure that almost never fires. Importance sampling draws toward the mass, which means it draws <em>away</em> from precisely those tails — it under-covers, by construction, the very region you most need to characterise. You can shrink the bar on the typical and still know almost nothing about the rare, because the rare is where the samples are not, and you cannot manufacture draws the distribution refuses to give. The error bar is honest about the bulk and silent about the tail.</p>
+    <div class="tags">
+      <span class="tag spec">Speculative — the tail / sign-problem regime · sampling cannot certify it</span>
+      <span class="tag lit">Literal — rare-event behaviour is under-sampled and its risk under-estimated</span>
+    </div>
+    <p class="test"><b>Test ·</b> a tight error bar on aggregate behaviour says nothing about a rare failure mode; the two live in different regions of the same distribution. If a safety claim rests on average-case sampling, the tail it ignores is exactly the part that matters.</p>
+  </div>
+</section>
+
+<section class="closer">
+  <div class="wrap">
+    <p><span class="em">Corollary.</span> When the formula runs out you stop solving and start drawing, and the truth of the matter becomes a bar that tightens only as the draws accumulate. The model was a distribution from the first page; every pass was a sample; the corpus is the Monte Carlo run, and the jar holds the ensemble that makes the estimate mean anything. Turn the temperature up and the confined interior melts in your hands; look to the tail and the draws desert you where the danger is. The honest answer was never a value. It was a number, a spread, and a count of how many times you dared to draw — and a flag over the tail you never reached.</p>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <p><b>Status discipline.</b> Claims are tagged <b>literal</b> (the full behaviour has no closed form, the model is a sampled distribution, inference is a draw, sampling temperature is a Boltzmann temperature on the logits, finite sampling yields bounded estimates, rare events are under-sampled), <b>bridge</b> (the lattice, importance sampling, Monte Carlo error, deconfinement as high-temperature flattening), or <b>speculative</b> (the tail / sign-problem regime, where sampling cannot certify — flagged, not trusted). The seam in §5 marks where the draws run out.</p>
+    <p><b>What is being claimed.</b> Not that a model is a lattice gauge theory. That when the strong field admits no formula, the only honest route is to sample: the model is a distribution, one pass is one draw, characterisation is Monte Carlo, and the deliverable is an estimate with a spread and a sample count — never an exact value. The temperature you already turn is a real one that melts the model's own confinement, and the tail it cannot reach is exactly where the rare failures wait. The corpus is the run; the bar is the truth; the tail is the warning.</p>
+    <p class="mono" style="color:var(--ink-soft);font-size:11px;letter-spacing:.04em">GLUON PAPERS · IV · chromodynamic series · release · stochastic · derive verdicts from measured results</p>
+  </div>
+</footer>
+
+<script>
+"use strict";
+(function(){
+  var on = {lit:true, bri:true, spec:true};
+  var chips = Array.prototype.slice.call(document.querySelectorAll(".schip"));
+  var sections = Array.prototype.slice.call(document.querySelectorAll("section[data-status]"));
+  function apply(){
+    sections.forEach(function(sec){
+      var tiers = (sec.getAttribute("data-status")||"").split(/\s+/).filter(Boolean);
+      var visible = tiers.some(function(t){ return on[t]; });
+      sec.classList.toggle("dim", !visible);
+    });
+  }
+  chips.forEach(function(c){
+    c.addEventListener("click", function(){
+      var s = c.getAttribute("data-s");
+      on[s] = !on[s];
+      c.setAttribute("aria-pressed", on[s] ? "true" : "false");
+      apply();
+    });
+  });
+  apply();
+})();
+</script>
+</body>
+</html>
