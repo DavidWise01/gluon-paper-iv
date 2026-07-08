@@ -4,6 +4,6 @@ slug  : gluon-paper-iv
 seal  : 6ce1ba83128154055a81bf2c6efa4a7cb2afde1771a9be9bc206acc29395264b
 prev  : a320bb9245c843d0dddcf050832c2a098bb800d5da5f604f1b1e6c28be2b7292
 link  : b6f3d9cefc6929f2eeb2a3cf8f81f2c97d64a791ecc121da5d829bd8942eb6e0
-head  : 3447d3a0533aaf1e29a8bdc67a9774884fb3ae9dbc8a17064b7a008ca3c4ec90
+head  : 13f9ace173ef2e60af38912ba329b4afcb5a38b84a0e4495e8d30327f8c99cc2
 
 — the tether: link = sha256(index|slug|seal|prev). the chain head commits to the whole corpus.
